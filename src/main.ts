@@ -31,6 +31,7 @@ import {preferFlatMapOverMapFlat} from './rules/prefer-flatmap-over-map-flat.js'
 import {preferStaticCollator} from './rules/prefer-static-collator.js';
 import {preferGetOrInsert} from './rules/prefer-get-or-insert.js';
 import {preferCharCodeAtInLoop} from './rules/prefer-charcode-at-in-loop.js';
+import {preferSliceOverSplitIndex} from './rules/prefer-slice-over-split-index.js';
 
 const plugin: ESLint.Plugin = {
   meta: {
@@ -67,6 +68,7 @@ const plugin: ESLint.Plugin = {
     'prefer-get-or-insert': preferGetOrInsert,
     'prefer-charcode-at-in-loop':
       preferCharCodeAtInLoop as never as Rule.RuleModule,
+    'prefer-slice-over-split-index': preferSliceOverSplitIndex,
     'ban-dependencies': banDependencies
   }
 };
