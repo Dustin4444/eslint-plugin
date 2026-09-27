@@ -51,6 +51,28 @@ function hasMatchingEngine(
 }
 
 /**
+ * Finds the mapping for `source` or its closest parent path. For example,
+ * `foo/bar/baz` checks `foo/bar/baz`, then `foo/bar`, then `foo`.
+ */
+function findMapping(
+  mappings: ManifestModule['mappings'],
+  source: string
+): ModuleReplacementMapping | undefined {
+  // `end` only decreases, so the loop always terminates.
+  for (
+    let end = source.length;
+    end > 0;
+    end = source.lastIndexOf('/', end - 1)
+  ) {
+    const moduleName = source.slice(0, end);
+    if (Object.hasOwn(mappings, moduleName)) {
+      return mappings[moduleName];
+    }
+  }
+  return undefined;
+}
+
+/**
  * Callback used for the replacement listener
  */
 function replacementListenerCallback(
@@ -70,16 +92,16 @@ function replacementListenerCallback(
   let currentMapping: ModuleReplacementMapping | undefined;
 
   for (const manifest of manifests) {
-    for (const [moduleName, mapping] of Object.entries(manifest.mappings)) {
-      if (moduleName === source || source.startsWith(`${moduleName}/`)) {
-        currentMapping = mapping;
-        for (const replacementId of mapping.replacements) {
-          const replacement = manifest.replacements[replacementId];
-          if (replacement) {
-            replacements.push(replacement);
-          }
-        }
-        break;
+    const mapping = findMapping(manifest.mappings, source);
+    if (!mapping) {
+      continue;
+    }
+
+    currentMapping = mapping;
+    for (const replacementId of mapping.replacements) {
+      const replacement = manifest.replacements[replacementId];
+      if (replacement) {
+        replacements.push(replacement);
       }
     }
   }
